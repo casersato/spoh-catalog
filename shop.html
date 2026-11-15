@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Каталог</title>
+<style>
+:root{--ink:#1d2a2e;--mut:#5d6b70;--bg:#f6f8f8;--card:#fff;--line:#dfe6e7;--acc:#0f6b5e;--acc2:#0a4f45;--hot:#b3315a;--ok:#1d2a2e}
+@media (prefers-color-scheme:dark){:root{--ink:#e8eeee;--mut:#9fb0b4;--bg:#111819;--card:#1a2426;--line:#2a393c;--acc:#35b3a0;--acc2:#2a9484;--hot:#ee7fa2}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:76px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top,0px)) 14px 8px;border-bottom:1px solid var(--line)}
+h1{font-size:19px;margin:0 0 8px}
+input[type=search]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--ink)}
+main{max-width:900px;margin:0 auto;padding:12px 14px}
+.note{font-size:13px;color:var(--mut);margin:0 0 10px}
+.warn{background:#fff4d6;color:#5a4300;border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.code{font-size:13px;color:var(--mut)}.name{font-weight:600}
+.price{font-size:18px;font-weight:700}.old{color:var(--mut);text-decoration:line-through;font-size:14px;margin-left:6px}
+.noprice{color:var(--mut)}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;min-height:44px;min-width:44px;background:var(--acc);color:#fff}
+button:focus-visible,input:focus-visible,nav a:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+.heart{background:transparent;color:var(--mut);font-size:24px;min-width:44px;padding:0}.heart.on{color:var(--hot)}
+.qty{display:flex;align-items:center;gap:10px;margin-top:auto}.qty b{min-width:28px;text-align:center;font-size:18px}
+.qty .minus{background:var(--line);color:var(--ink)}
+.add{width:100%}
+.sum{font-size:14px;color:var(--mut)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav a{flex:1;text-align:center;padding:12px 4px;color:var(--mut);text-decoration:none;font-size:14px;min-height:52px}
+nav a.on{color:var(--acc);font-weight:700}
+.badge{background:var(--hot);color:#fff;border-radius:9px;padding:0 6px;font-size:12px;margin-left:3px}
+.bar{position:sticky;bottom:60px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px}
+.wa{display:block;width:100%;background:#1a9c4a;color:#fff;font-weight:700;margin-top:8px;text-align:center;text-decoration:none;padding:12px;border-radius:10px;min-height:44px}
+.ghost{background:transparent;color:var(--hot);border:1px solid var(--line);width:100%;margin-top:8px}
+#toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%}
+#toast.show{opacity:1}
+.empty{text-align:center;color:var(--mut);padding:36px 12px}
+.more{width:100%;margin-top:12px;background:var(--line);color:var(--ink)}
+.pic{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:var(--line)}
+.desc{font-size:13px;color:var(--mut)}
+.ar{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px}
+.ar img,.ar .ph{width:48px;height:48px;border-radius:6px;object-fit:cover;background:var(--line);flex:none}
+.ar .i{flex:1;min-width:0;font-size:14px}.ar .i b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar button,.ab{min-height:36px;padding:0 10px;font-size:14px}
+.ab{background:var(--line);color:var(--ink)}.dg{background:transparent;color:var(--hot);border:1px solid var(--line)}
+.f label{display:block;margin:10px 0 3px;font-size:13px;color:var(--mut)}
+.f input,.f textarea,.al input{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
+dialog{width:min(520px,94vw);max-height:92vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.al{max-width:380px;margin:20px auto}.al input{margin:6px 0}
+</style>
+</head>
+<body>
+<header><h1 id="shop"></h1><input id="q" type="search" placeholder="Поиск по названию или коду" aria-label="Поиск"></header>
+<main id="view"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<nav>
+<a href="#/" id="n-home">Каталог</a><a href="#/fav" id="n-fav">Избранное</a><a href="#/cart" id="n-cart">Корзина<span class="badge" id="badge" hidden>0</span></a><a href="#/admin" id="n-adm">Админ</a>
+</nav>
+<script>// НАСТРОЙКИ САЙТА — меняйте только значения в кавычках
+window.CONFIG = {
+  SHOP_NAME: "Название магазина",          // ← впишите своё название
+  WHATSAPP_NUMBER: "77716151216",                      // ← номер в международном формате без +, пробелов и скобок, например 77001234567
+  ABOUT: "Каталог продукции. Выберите товары, укажите количество и отправьте заказ в WhatsApp.",
+  SUPABASE_URL: "https://tkvbfmtzskzewbojmumw.supabase.co",   // ← адрес проекта Supabase, например https://abcd.supabase.co
+  SUPABASE_ANON_KEY: "sb_publishable_0MemRUY0p1X8qyiRfmaYFg_DXNhV3mP",   // ← публичный ключ anon
+  CONTACT_TEXT: "Контакты: добавьте телефон или адрес здесь"
+};
+</script>
+<script>/* Логика каталога, корзины, избранного и сообщения WhatsApp */
+(function (root) {
+  function money(n) { return n == null ? null : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0") + "\u00A0₸"; }
+
+  // Корзина хранит только код и количество: цены берутся из текущего каталога,
+  // поэтому при замене products.json цены обновляются сами.
+  function buildMessage(cart, byCode, catalogName) {
+    var lines = [], n = 0, total = 0, allPriced = true, i = 0;
+    Object.keys(cart).forEach(function (code) {
+      var p = byCode[code], q = cart[code];
+      if (!p || !(q > 0)) return;
+      i++; n += q;
+      var s = i + ". " + p.name + " #" + p.code + " — " + q + " шт.";
+      if (p.price != null) { var sum = p.price * q; total += sum; s += " (" + money(p.price) + " × " + q + " = " + money(sum) + ")"; }
+      else allPriced = false;
+      lines.push(s);
+    });
+    if (!lines.length) return null;
+    var t = "Здравствуйте! Хотел бы заказать следующие товары:\n\n" + lines.join("\n") +
+      "\n\nОбщее количество: " + n + " шт.";
+    if (allPriced) t += "\nСумма по каталогу " + catalogName + ": " + money(total);
+    t += "\n\nПрошу подтвердить наличие, стоимость и условия доставки.";
+    return t;
+  }
+  function waLink(number, text) {
+    var num = String(number || "").replace(/\D/g, "");
+    return "https://wa.me/" + num + "?text=" + encodeURIComponent(text);
+  }
+  var api = { buildMessage: buildMessage, waLink: waLink, money: money };
+  if (typeof module !== "undefined") module.exports = api; else root.CatalogLib = api;
+})(this);
+</script>
+<script>
+(function(){
+var C=window.CONFIG,L=window.CatalogLib,view=document.getElementById('view'),q=document.getElementById('q');
+var DB={meta:{},products:[]},by={},shown=60;
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var cart=load('cart',{}),fav=load('fav',{});
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var tt;function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show')},1800)}
+function count(){var n=0;for(var k in cart)n+=cart[k];return n}
+function badge(){var b=document.getElementById('badge'),n=count();b.hidden=!n;b.textContent=n}
+function setQty(code,n){if(n<=0){delete cart[code];toast('Товар удалён из корзины')}else{cart[code]=n}save('cart',cart);badge()}
+function priceHTML(p){return p.price==null?'<span class="noprice">Цена по запросу</span>':'<span class="price">'+L.money(p.price)+'</span>'+(p.old?'<span class="old">'+L.money(p.old)+'</span>':'')}
+function card(p){var n=cart[p.code]||0;
+return '<div class="card" data-c="'+esc(p.code)+'">'+(p.image?'<img class="pic" src="'+esc(p.image)+'" alt="" loading="lazy">':'')+'<div class="top"><div><div class="code">№ '+esc(p.code)+'</div><div class="name">'+esc(p.name)+'</div></div>'+
+(Admin.ok?'<button class="heart" data-a="edit" aria-label="Изменить">✎</button>':'')+'<button class="heart'+(fav[p.code]?' on':'')+'" data-a="fav" aria-label="Избранное" aria-pressed="'+!!fav[p.code]+'">'+(fav[p.code]?'♥':'♡')+'</button></div>'+
+'<div>'+priceHTML(p)+'</div>'+(p.description?'<div class="desc">'+esc(p.description)+'</div>':'')+
+(n?'<div class="qty"><button class="minus" data-a="minus" aria-label="Меньше">−</button><b>'+n+'</b><button data-a="plus" aria-label="Больше">+</button></div>':
+'<div class="qty"><button class="add" data-a="plus">+ В корзину</button></div>')+'</div>'}
+function match(p,s){s=s.toLowerCase();return !s||p.name.toLowerCase().indexOf(s)>-1||p.code.toLowerCase().indexOf(s)>-1}
+function warn(){return DB.meta.verified===false?'<div class="warn">Каталог '+esc(DB.meta.catalog||'')+': данные из PDF не проверены. Уточняйте цену и наличие при заказе.</div>':''}
+function home(){var list=DB.products.filter(function(p){return match(p,q.value.trim())});
+var h=warn()+'<p class="note">'+esc(C.ABOUT)+'</p><p class="note">Цены по каталогу '+esc(DB.meta.catalog||'')+(DB.meta.valid?' ('+esc(DB.meta.valid)+')':'')+'. Найдено: '+list.length+'</p>';
+if(!list.length)return h+'<div class="empty">Ничего не найдено. Измените запрос.</div>';
+h+='<div class="grid">'+list.slice(0,shown).map(card).join('')+'</div>';
+if(list.length>shown)h+='<button class="more" data-a="more">Показать ещё</button>';return h+'<p class="note" style="text-align:center"><a href="#/admin">Для редакторов</a></p>'}
+function favs(){var list=DB.products.filter(function(p){return fav[p.code]});
+return list.length?'<div class="grid">'+list.map(card).join('')+'</div>':'<div class="empty">Нажмите ♡ на товаре, чтобы сохранить его здесь. Избранное не попадает в заказ.</div>'}
+function cartView(){var codes=Object.keys(cart);
+if(!codes.length)return '<div class="empty">Корзина пуста. Добавьте товары в каталоге.</div>';
+var h='',n=0,tot=0,all=true,gone=false;
+codes.forEach(function(c){var p=by[c],q=cart[c];
+if(!p){gone=true;h+='<div class="card"><div class="name">№ '+esc(c)+'</div><div class="note">Этого товара нет в текущем каталоге. Он не попадёт в заказ.</div><button class="ghost" data-c="'+esc(c)+'" data-a="rm">Удалить</button></div>';return}
+n+=q;if(p.price==null)all=false;else tot+=p.price*q;
+h+=card(p).replace('</div></div>','</div></div>').replace(/<\/div>$/,(p.price!=null?'<div class="sum">Сумма: '+L.money(p.price*q)+'</div>':'')+'<button class="ghost" data-a="rm">Удалить</button></div>')});
+h='<div class="grid">'+h+'</div><div class="bar"><div>Всего: <b>'+n+' шт.</b>'+(all&&n?' · <b>'+L.money(tot)+'</b>':'')+'</div>'+
+(all?'':'<div class="note">Для части товаров цена по запросу — общая сумма не считается.</div>')+
+(C.WHATSAPP_NUMBER?'':'<div class="note">Номер WhatsApp не задан в config.js: откроется выбор контакта.</div>')+
+(function(){var cl={};Object.keys(cart).forEach(function(k){if(by[k])cl[k]=cart[k]});var m=L.buildMessage(cl,by,DB.meta.catalog||'');return m?'<a class="wa" target="_blank" rel="noopener" href="'+L.waLink(C.WHATSAPP_NUMBER,m)+'">Оформить заказ в WhatsApp</a>':''})()+'<button class="ghost" data-a="clear">Очистить корзину</button></div>';return h}
+function route(){var r=location.hash||'#/';['home','fav','cart','adm'].forEach(function(k){document.getElementById('n-'+k).classList.remove('on')});
+if(r==='#/admin'){document.getElementById('n-adm').classList.add('on');Admin.show()}else if(r==='#/fav'){document.getElementById('n-fav').classList.add('on');view.innerHTML=favs()}
+else if(r==='#/cart'){document.getElementById('n-cart').classList.add('on');view.innerHTML=cartView()}
+else{document.getElementById('n-home').classList.add('on');view.innerHTML=home()}}
+function keepFocus(fn){fn()}
+view.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||b.hasAttribute('data-ad'))return;var a=b.dataset.a,el=b.closest('.card'),c=el&&el.dataset.c||b.dataset.c;
+if(a==='edit'){Admin.edit(c);return}
+if(a==='more'){shown+=60;route();return}
+if(a==='fav'){if(fav[c]){delete fav[c];toast('Убрано из избранного')}else{fav[c]=1;toast('Добавлено в избранное')}save('fav',fav)}
+else if(a==='plus'){setQty(c,(cart[c]||0)+1);toast('Количество: '+cart[c])}
+else if(a==='minus'){setQty(c,(cart[c]||0)-1)}
+else if(a==='rm'){setQty(c,0)}
+else if(a==='clear'){if(confirm('Очистить корзину?')){cart={};save('cart',cart);badge();toast('Корзина очищена')}}
+else if(a==='order'){var clean={};Object.keys(cart).forEach(function(k){if(by[k])clean[k]=cart[k]});
+var m=L.buildMessage(clean,by,DB.meta.catalog||'');if(!m){toast('Корзина пуста');return}
+window.open(L.waLink(C.WHATSAPP_NUMBER,m),'_blank','noopener');return}
+route()});
+q.addEventListener('input',function(){shown=60;if(location.hash&&location.hash!=='#/')location.hash='#/';else route()});
+window.addEventListener('hashchange',route);
+document.getElementById('shop').textContent=C.SHOP_NAME;document.title=C.SHOP_NAME;
+
+var SB=(C.SUPABASE_URL||'').replace(/\/$/,''),KEY=C.SUPABASE_ANON_KEY||'';
+function setDB(d){d.products=d.products.filter(function(p){return !p.hidden});DB=d;by={};DB.products.forEach(function(p){by[p.code]=p});badge();route()}
+function loadDB(){var loc=fetch('products.json?t='+Date.now()).then(function(r){return r.json()});if(!SB)return loc;
+return loc.then(function(L){return fetch(SB+'/rest/v1/products?select=*&hidden=eq.false&order=page.asc,code.asc',{headers:{apikey:KEY}}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(rows){return rows.length?{meta:{catalog:L.meta.catalog,verified:true},products:rows}:L}).catch(function(){return L})})}
+var Admin=(function(){
+var S=null,all=[],role='',ok=false,box=null,GT=localStorage.getItem('gh_t')||'',REPO=C.GH_REPO||'diastolegen60-cloud/Ainurcatalog',gsha='',gmeta={};try{S=JSON.parse(sessionStorage.getItem('adm'))}catch(e){}
+var INP='width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)';
+var OWNER='<div class="bar" style="position:static"><b>Владелец</b><p class="note">Редактор создаётся в Supabase (Authentication → Add user). Затем добавьте его email сюда.</p><input id="ed_em" type="email" placeholder="email редактора" style="'+INP+'"><div style="display:flex;gap:8px;margin-top:8px"><button data-ad="eadd">Дать права</button><button class="dg" data-ad="edel">Забрать права</button></div><button class="dg" data-ad="tr" style="width:100%;margin-top:8px">Передать владение этому email</button><button class="ab" data-ad="imp" style="width:100%;margin-top:8px">Загрузить products.json в базу</button></div>';
+function setS(j,em){S={at:j.access_token,rt:j.refresh_token,exp:Math.floor(Date.now()/1000)+j.expires_in,email:em};sessionStorage.setItem('adm',JSON.stringify(S))}
+function auth(body,type){return fetch(SB+'/auth/v1/token?grant_type='+type,{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
+function tok(){if(!S)return Promise.reject(new Error('Нужен вход'));if(S.exp>Date.now()/1000+30)return Promise.resolve(S.at);
+return auth({refresh_token:S.rt},'refresh_token').then(function(j){if(!j.access_token){S=null;sessionStorage.removeItem('adm');throw new Error('Войдите снова')}setS(j,S.email);return S.at})}
+function api(path,o){o=o||{};return tok().then(function(t){var h=Object.assign({apikey:KEY,Authorization:'Bearer '+t,'Content-Type':'application/json'},o.headers);return fetch(SB+path,Object.assign({},o,{headers:h}))}).then(function(r){if(!r.ok)return r.text().then(function(x){throw new Error(x||r.status)});return r.text().then(function(x){return x?JSON.parse(x):null})})}
+function gh(path,o){return fetch('https://api.github.com/repos/'+REPO+path,Object.assign({},o,{headers:{Authorization:'Bearer '+GT,Accept:'application/vnd.github+json','Content-Type':'application/json'}})).then(function(r){if(!r.ok)return r.json().catch(function(){return{}}).then(function(j){throw new Error(r.status===401?'Токен не подошёл':r.status===409?'Данные изменились, обновите страницу':(j.message||r.status))});return r.json()})}
+function b64(s){var b=new TextEncoder().encode(s),t='';b.forEach(function(c){t+=String.fromCharCode(c)});return btoa(t)}
+function unb64(s){var t=atob(s.replace(/\n/g,''));return new TextDecoder().decode(Uint8Array.from(t,function(c){return c.charCodeAt(0)}))}
+function ghLoad(){return gh('/contents/products.json').then(function(j){gsha=j.sha;var d=JSON.parse(unb64(j.content));gmeta=d.meta||{};all=d.products;return gh('')}).then(function(r){ok=!!(r.permissions&&r.permissions.push);role='owner'})}
+function ghSave(msg){return gh('/contents/products.json',{method:'PUT',body:JSON.stringify({message:msg,content:b64(JSON.stringify({meta:gmeta,products:all})),sha:gsha})}).then(function(r){gsha=r.content.sha})}
+function ensure(){return gsha?Promise.resolve():ghLoad()}
+function load(){if(!SB)return ghLoad();return api('/rest/v1/editors?select=role,email').then(function(r){ok=r.length>0;role=r.some(function(x){return x.role==='owner'})?'owner':'editor';if(ok)return api('/rest/v1/products?select=*&order=page.asc,code.asc&limit=3000').then(function(p){all=p})}).catch(function(e){if(!S)ok=false;else throw e})}
+function reload(){if(SB)return loadDB().then(setDB);setDB({meta:gmeta,products:all.slice()})}
+function resize(f){return new Promise(function(res,rej){var im=new Image();im.onload=function(){var k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);c.toBlob(res,'image/jpeg',.82)};im.onerror=rej;im.src=URL.createObjectURL(f)})}
+function upload(f,code){return resize(f).then(function(bl){
+if(SB)return tok().then(function(t){var n=code+'-'+Date.now()+'.jpg';return fetch(SB+'/storage/v1/object/photos/'+n,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+t,'Content-Type':'image/jpeg'},body:bl}).then(function(r){if(!r.ok)throw new Error('Фото не загрузилось');return SB+'/storage/v1/object/public/photos/'+n})});
+return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){res(fr.result.split(',')[1])};fr.onerror=rej;fr.readAsDataURL(bl)}).then(function(b){var n='images/'+code+'-'+Date.now()+'.jpg';return gh('/contents/'+n,{method:'PUT',body:JSON.stringify({message:'Фото '+code,content:b})}).then(function(){return n})})})}
+function store(o){if(SB)return api('/rest/v1/products?on_conflict=code',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([o])});
+return ensure().then(function(){var x={};for(var k in o)if(o[k]!==null&&o[k]!==false&&k!=='updated_at')x[k]=o[k];var i=all.findIndex(function(p){return p.code===o.code});
+if(i>-1){var m=Object.assign({},all[i],x);['price','old','description','image','hidden'].forEach(function(k){if(!(k in x))delete m[k]});all[i]=m}else all.push(x);return ghSave('Товар '+o.code)})}
+function dlg(){if(!box){box=document.createElement('dialog');document.body.appendChild(box)}return box}
+function edit(code){var p=code?(all.find(function(x){return x.code===code})||by[code]):{};p=p||{};var d=dlg();
+d.innerHTML='<div class="f"><h3>'+(code?'Изменить товар':'Новый товар')+'</h3><label>Код</label><input id="e_code" value="'+esc(p.code||'')+'"'+(code?' readonly':'')+'><label>Название</label><input id="e_name" value="'+esc(p.name||'')+'"><label>Цена, ₸</label><input id="e_price" inputmode="numeric" value="'+(p.price==null?'':p.price)+'"><label>Старая цена, ₸</label><input id="e_old" inputmode="numeric" value="'+(p.old||'')+'"><label>Описание</label><textarea id="e_desc" rows="3">'+esc(p.description||'')+'</textarea><label>Фото</label><input id="e_img" value="'+esc(p.image||'')+'" placeholder="ссылка на фото"><input id="e_file" type="file" accept="image/*" style="margin-top:6px"><label><input id="e_hid" type="checkbox" style="width:auto"'+(p.hidden?' checked':'')+'> Скрыть из каталога</label><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="ab" data-ad="x">Отмена</button><button data-ad="ok">Сохранить</button></div></div>';
+d.showModal();
+d.onclick=function(e){var b=e.target.closest('button');if(!b)return;if(b.dataset.ad==='x')d.close();if(b.dataset.ad==='ok'){b.disabled=true;var fl=document.getElementById('e_file').files[0],c=document.getElementById('e_code').value.trim();
+if(!c){toast('Укажите код');b.disabled=false;return}
+(fl?upload(fl,c):Promise.resolve(document.getElementById('e_img').value.trim())).then(function(img){var n=function(id){var v=document.getElementById(id).value.trim();return v===''?null:Number(v.replace(/\s/g,''))};
+var o={code:c,name:document.getElementById('e_name').value.trim()||'Товар '+c,price:n('e_price'),old:n('e_old'),description:document.getElementById('e_desc').value.trim()||null,image:img||null,hidden:document.getElementById('e_hid').checked,updated_at:new Date().toISOString()};if(p.page)o.page=p.page;
+return store(o)}).then(function(){d.close();toast('Сохранено'+(SB?'':'. Сайт обновится через 1–2 минуты'));return reload()}).catch(function(e){toast('Ошибка: '+e.message);b.disabled=false})}}}
+function list(q){q=(q||'').toLowerCase();return all.filter(function(p){return !q||(p.name+' '+p.code).toLowerCase().indexOf(q)>-1}).slice(0,80).map(function(p){return '<div class="ar">'+(p.image?'<img src="'+esc(p.image)+'" alt="">':'<div class="ph"></div>')+'<div class="i"><b>'+esc(p.name)+(p.hidden?' (скрыт)':'')+'</b>№ '+esc(p.code)+' · '+(p.price==null?'без цены':L.money(p.price))+'</div><button class="ab" data-ad="ed" data-c="'+esc(p.code)+'">Изменить</button><button class="dg" data-ad="del" data-c="'+esc(p.code)+'">✕</button></div>'}).join('')||'<div class="empty">Ничего не найдено</div>'}
+function panel(){var who=SB?esc(S.email)+' ('+role+')':'владелец, GitHub';
+view.innerHTML='<div style="display:flex;gap:8px;margin-bottom:8px"><input id="aq" type="search" placeholder="Поиск" style="flex:1;'+INP+'"><button data-ad="new">+ Товар</button></div><p class="note">Вы: '+who+' · товаров: '+all.length+' · <a href="#" data-ad="out" onclick="return false">выйти</a></p>'+(!SB&&gmeta.verified===false?'<button class="ab" data-ad="ver" style="width:100%;margin-bottom:8px">Убрать пометку «данные не проверены»</button>':'')+'<div id="al">'+list('')+'</div>'+(SB&&role==='owner'?OWNER:'');
+document.getElementById('aq').oninput=function(){document.getElementById('al').innerHTML=list(this.value)}}
+function errv(e){view.innerHTML='<div class="empty">'+esc(e.message)+'<br><button data-ad="out" style="margin-top:10px">Выйти</button></div>'}
+function show(){var h='<div class="al">';
+if(SB&&!S){view.innerHTML=h+'<h3>Вход для редакторов</h3><p class="note">Введите почту, на неё придёт код для входа.</p><input id="a_em" type="email" placeholder="Email" autocomplete="username"><button data-ad="sendcode" style="width:100%;margin-top:8px">Получить код</button><div id="a_c" hidden><input id="a_code" inputmode="numeric" placeholder="Код из письма" autocomplete="one-time-code"><button data-ad="verify" style="width:100%;margin-top:8px">Войти</button></div><p class="note" id="a_er"></p></div>';return}
+if(!SB&&!GT){view.innerHTML=h+'<h3>Вход для владельца</h3><p class="note">Вставьте GitHub-токен с правом записи (Contents: Read and write) в репозиторий '+esc(REPO)+'. Он сохранится только в этом браузере.</p><input id="a_tk" type="password" placeholder="github_pat_..." autocomplete="off"><button data-ad="gl" style="width:100%;margin-top:8px">Войти</button><p class="note" id="a_er"></p></div>';return}
+view.innerHTML='<div class="empty">Загрузка...</div>';
+load().then(function(){if(!ok){view.innerHTML='<div class="empty">'+(SB?'У этого аккаунта нет прав редактора.':'У токена нет права записи в репозиторий.')+'<br><button data-ad="out" style="margin-top:10px">Выйти</button></div>';return}panel()}).catch(errv)}
+view.addEventListener('click',function(e){var b=e.target.closest('[data-ad]');if(!b||b.closest('dialog'))return;var a=b.dataset.ad,c=b.dataset.c,er=function(x){toast('Ошибка: '+x.message)};
+if(a==='sendcode'){var em0=document.getElementById('a_em').value.trim();fetch(SB+'/auth/v1/otp',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({email:em0,create_user:false})}).then(function(r){if(!r.ok)return r.json().catch(function(){return{}}).then(function(j){throw new Error('Не удалось отправить код: '+(j.msg||j.error_description||j.message||j.error||('ошибка '+r.status)))});document.getElementById('a_c').hidden=false;document.getElementById('a_er').textContent='Код отправлен на '+em0}).catch(function(x){document.getElementById('a_er').textContent=x.message})}
+else if(a==='verify'){var em1=document.getElementById('a_em').value.trim();fetch(SB+'/auth/v1/verify',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({type:'email',email:em1,token:document.getElementById('a_code').value.trim()})}).then(function(r){return r.json()}).then(function(j){if(!j.access_token)throw new Error('Неверный или просроченный код');setS(j,em1);show()}).catch(function(x){document.getElementById('a_er').textContent=x.message})}
+else if(a==='gl'){GT=document.getElementById('a_tk').value.trim();if(GT){localStorage.setItem('gh_t',GT);gsha='';show()}}
+else if(a==='out'){S=null;GT='';gsha='';ok=false;sessionStorage.removeItem('adm');localStorage.removeItem('gh_t');show()}
+else if(a==='new')edit('');else if(a==='ed')edit(c);
+else if(a==='ver'){gmeta.verified=true;delete gmeta.note;ghSave('Каталог проверен').then(function(){toast('Пометка убрана');reload()}).catch(er)}
+else if(a==='del'){if(confirm('Удалить товар № '+c+'?'))(SB?api('/rest/v1/products?code=eq.'+encodeURIComponent(c),{method:'DELETE'}):ensure().then(function(){all=all.filter(function(p){return p.code!==c});return ghSave('Удалён '+c)})).then(function(){toast('Удалено');return reload()}).catch(er)}
+else if(a==='eadd'||a==='edel'){var em=document.getElementById('ed_em').value.trim();if(!em)return;api('/rest/v1/rpc/'+(a==='eadd'?'add_editor':'remove_editor'),{method:'POST',body:JSON.stringify({p_email:em})}).then(function(){toast(a==='eadd'?'Права выданы':'Права забраны')}).catch(er)}
+else if(a==='tr'){var em2=document.getElementById('ed_em').value.trim();if(!em2||!confirm('Передать владение '+em2+'? Вы станете обычным редактором.'))return;api('/rest/v1/rpc/transfer_owner',{method:'POST',body:JSON.stringify({p_email:em2})}).then(function(){toast('Владение передано');show()}).catch(er)}
+else if(a==='imp'){if(!confirm('Загрузить товары из products.json? Совпадающие коды будут перезаписаны.'))return;fetch('products.json').then(function(r){return r.json()}).then(function(d){var rows=d.products.map(function(p){return{code:p.code,name:p.name,price:p.price,old:p.old||null,page:p.page}}),ch=[];for(var i=0;i<rows.length;i+=200)ch.push(rows.slice(i,i+200));
+return ch.reduce(function(pr,c){return pr.then(function(){return api('/rest/v1/products?on_conflict=code',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(c)})})},Promise.resolve())}).then(function(){toast('Загружено');return reload()}).catch(er)}});
+if(SB?S:GT)load().then(function(){route()}).catch(function(){});
+return{show:show,edit:edit,get ok(){return ok&&(SB?!!S:!!GT)}}})();
+loadDB().then(setDB).catch(function(){view.innerHTML='<div class="empty">Не удалось загрузить каталог</div>'});
+;
+})();
+</script>
+</body>
+</html>
